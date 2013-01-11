@@ -3,20 +3,20 @@ import logging
 import functools
 import copy
 import unittest
-import bigfont
-import smoosh
+from smoosh import Smoosher
+from base import BaseObject
 
-class BigLetter(bigfont.base.BaseObject):
+class BigLetter(BaseObject):
     """
     Represents a single letter in a font.
     """
     
     def __init__(self,lines,hardblank='$',rules=None,**kwargs):
-        super().__init__(**kwargs)
+        super(BigLetter,self).__init__(**kwargs)
         self._set_lines(lines)
         self.hardblank = hardblank
         if rules is None:
-            self.rules = smoosh.Smoosher()
+            self.rules = Smoosher()
         else:
             self.rules = rules
 

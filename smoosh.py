@@ -1,6 +1,6 @@
-import bigfont
+from base import BaseObject
 
-class Smoosher(bigfont.base.BaseObject):
+class Smoosher(BaseObject):
     """Uses various rules to combine characters into a single character."""
     def __init__(self,
                  universal=False,
@@ -16,7 +16,7 @@ class Smoosher(bigfont.base.BaseObject):
                  horizontal_line=False,
                  vertical_line=False,
                  **kwargs):
-        super().__init__(**kwargs)
+        super(Smoosher,self).__init__(**kwargs)
         self.universal=universal
         self.equal_char=equal_char
         self.underscore=underscore

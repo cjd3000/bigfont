@@ -1,4 +1,6 @@
-import zipfile
+from __future__ import print_function
+from __future__ import division
+
 import copy
 import functools
 import os
@@ -8,7 +10,10 @@ import base
 import unittest
 import operator
 import pickle
-import bigfont
+
+from zipfile import ZipFile, BadZipfile # or BadZipFile in 3.x
+from base import BaseObject
+from letter import BigLetter
 from decorators import trace
 
 def font_from_file(filename):
@@ -16,10 +21,10 @@ def font_from_file(filename):
     data = None
     while 1:
         try: # zipped?
-            with zipfile.ZipFile(filename,'r') as fh:
+            with ZipFile(filename,'r') as fh:
                 data = fh.read(os.path.basename(filename))
             break
-        except zipfile.BadZipFile as e:
+        except BadZipfile as e:
             logging.info("%s does not appear to be a zipfile" % filename)
 
         with open(filename,'r') as fh:
@@ -33,10 +38,10 @@ def font_from_pickle(fontname,pklfile='fontcache.pkl'):
         pklfonts = pickle.load(fh)
         return pklfonts[fontname]
 
-class BigFont(bigfont.base.BaseObject):
+class BigFont(BaseObject):
     """Stores all characters from a font as a list of BigLetters."""
     def __init__(self,data=None,name=None,nonprintable=32,eol="\n",**kwargs):
-        super().__init__(**kwargs)
+        super(BigFont,self).__init__(**kwargs)
         self.nonprintable = nonprintable
         self.letters = self._extract_letters(data)
         #self.renderfcn = kern
@@ -63,7 +68,7 @@ class BigFont(bigfont.base.BaseObject):
         for line in lines:
             if len(line) > 1 and line[-2:] == (endchar*2):
                 buf.append(line[:-2])
-                letters.append(bigfont.BigLetter(buf))
+                letters.append(BigLetter(buf))
                 buf = []
             elif len(line) > 0 and line[-1] == endchar:
                 buf.append(line[:-1])
