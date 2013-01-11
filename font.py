@@ -108,11 +108,11 @@ class BasicBigFontTests(unittest.TestCase):
         pass
     
     def test_file_load(self):
-        standard = font_from_file('standard.flf')
+        standard = font_from_file(os.path.join('fonts','standard.flf'))
         self.assertEqual(1,1)
 
     def test_call(self):
-        standard = font_from_file('standard.flf')
+        standard = font_from_file(os.path.join('fonts','standard.flf'))
         self.assertEqual(standard['a'],standard['a'])
 
 
