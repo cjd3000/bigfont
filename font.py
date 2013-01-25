@@ -7,7 +7,6 @@ import os
 import re
 import logging
 import base
-import unittest
 import operator
 import pickle
 
@@ -102,22 +101,6 @@ class BigFont(BaseObject):
             print(self.render(line))
 
 
-class BasicBigFontTests(unittest.TestCase):
-    
-    def setUp(self):
-        pass
-    
-    def test_file_load(self):
-        standard = font_from_file(os.path.join('fonts','standard.flf'))
-        self.assertEqual(1,1)
-
-    def test_call(self):
-        standard = font_from_file(os.path.join('fonts','standard.flf'))
-        self.assertEqual(standard['a'],standard['a'])
-
-
-if __name__ == "__main__":
-    unittest.main(exit=False)
 
 
 

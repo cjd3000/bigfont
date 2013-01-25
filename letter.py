@@ -2,7 +2,6 @@ import re
 import logging
 import functools
 import copy
-import unittest
 from smoosh import Smoosher
 from base import BaseObject
 
@@ -93,27 +92,4 @@ class BigLetter(BaseObject):
         newletter = copy.copy(self)
         newletter._set_lines(newlines)
         return newletter           
-    
-class BasicBigLetterTests(unittest.TestCase):
 
-    def setUp(self):
-        self.letterD = BigLetter(["|-\\","| |","| /"])
-        self.letterE = BigLetter(("----","--  ","____"))
-        #print(self.letterD)
-        #print(self.letterE)
-
-    def test_add(self):
-        dc = copy.copy(self.letterD)
-        de = self.letterD + self.letterE
-        de2 = copy.copy(self.letterD)
-        de2 += self.letterE
-        self.assertEqual(de, de2)
-        self.assertEqual(dc + self.letterD, self.letterD + dc)
-
-    def test_equality(self):
-        self.assertNotEqual(self.letterD,self.letterE)
-        self.assertEqual(copy.copy(self.letterD),self.letterD)
-        
-
-if __name__ == "__main__":
-    unittest.main(exit=False)

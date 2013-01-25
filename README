@@ -1,2 +1,3 @@
-bigfont is pure Python library for rendering large text using smaller
-characters (ASCII text art), similar to the programs FIGlet or TOIlet.
+bigfont is a pure Python library for rendering large console text
+using fixed-width characters (ASCII art), similar to the programs
+FIGlet or TOIlet.
