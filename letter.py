@@ -2,6 +2,7 @@ import re
 import logging
 import functools
 import copy
+from itertools import izip
 from smoosh import Smoosher
 from base import BaseObject
 
@@ -29,25 +30,12 @@ class BigLetter(BaseObject):
         return re.sub(re.escape(self.hardblank),' ',out) # remove hardblanks
 
     def __add__(self,other):
-        #fixme use smoosh rules
-        newlines = []
-        for s,o in zip(self.lines, other.lines):
-            newlines.append(s + o)
-        newletter = copy.copy(self)
-        newletter._set_lines(newlines)
-        return newletter
+        return self.push(other)
 
     def __eq__(self,other):
         if self.lines == other.lines:
             return True
         return False
-
-    def __iadd__(self,other):
-        newlines = []
-        for s,o in zip(self.lines, other.lines):
-            newlines.append(s + o)
-        self._set_lines(newlines)
-        return self
 
     def __iter__(self):
         for line in self.lines:
@@ -55,7 +43,7 @@ class BigLetter(BaseObject):
 
     def touch(self,other):
         """Determine this letter touches other letter on its right side."""
-        for lr,rr in zip(self,other):
+        for lr,rr in izip(self,other):
             if lr[-1] != ' ' and rr[0] != ' ':
                 return True
         return False
@@ -64,7 +52,7 @@ class BigLetter(BaseObject):
         """Returns the smallest amount of horizontal space between
         this letter's right side and another letter."""
         minspace = None
-        for lrow,rrow in zip(self,other):
+        for lrow,rrow in izip(self,other):
             ls = lrow.rstrip(' ')
             rs = rrow.lstrip(' ')
             lstripped = len(lrow) - len(ls)
