@@ -30,7 +30,7 @@ class Smoosher(BaseObject):
         self.horizontal_line=horizontal_line
         self.vertical_line=vertical_line
 
-    def smoosh(a,b):
+    def smoosh(self,a,b):
         """Smoosh single characters according to smooshing rules."""
         if a == ' ':
             return b
