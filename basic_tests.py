@@ -47,3 +47,6 @@ suites.append(unittest.TestLoader().loadTestsFromTestCase(BasicBigLetterTests))
 suites.append(unittest.TestLoader().loadTestsFromTestCase(BasicBigFontTests))
 alltests = unittest.TestSuite(suites)
 unittest.TextTestRunner(verbosity=2).run(alltests)
+
+if os.name == 'nt':
+    raw_input("Press enter to exit.")
