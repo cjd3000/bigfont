@@ -41,10 +41,21 @@ class BasicBigFontTests(unittest.TestCase):
         standard = font_from_file(os.path.join('fonts','standard.flf'))
         self.assertEqual(standard['a'],standard['a'])
 
+import font
+class BasicRenderTests(unittest.TestCase):
+    def setUp(self):
+        pass
+
+    def test_autoload(self):
+        rendered = font.render("teststr")
+
+        
+
 
 suites = []
 suites.append(unittest.TestLoader().loadTestsFromTestCase(BasicBigLetterTests))
 suites.append(unittest.TestLoader().loadTestsFromTestCase(BasicBigFontTests))
+suites.append(unittest.TestLoader().loadTestsFromTestCase(BasicRenderTests))
 alltests = unittest.TestSuite(suites)
 unittest.TextTestRunner(verbosity=2).run(alltests)
 

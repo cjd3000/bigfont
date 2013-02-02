@@ -9,11 +9,44 @@ import logging
 import base
 import operator
 import pickle
+import inspect
 
 from zipfile import ZipFile, BadZipfile # or BadZipFile in 3.x
 from base import BaseObject
 from letter import BigLetter
 from decorators import trace
+
+def bigprint(text,font=None):
+    """Print text in big font.
+
+    Uses given BigFont if specified, otherwise a default font."""
+    print(render(text,font))
+
+_default_font = 'standard.flf'
+def render(text,font=None):
+    """Render text in big font and return as a string.
+
+    Uses given BigFont if specified, otherwise a default font."""
+    if font is None:
+        if not _builtin_fonts.has_key(_default_font):
+            _get_builtins()
+            font = _builtin_fonts[_default_font]
+
+    return font.render(text)
+
+_builtin_fonts = {}
+def _get_builtins():
+    """Retrieve any fonts from bigfont/fonts."""
+    global _builtin_fonts
+    mypath = os.path.dirname(inspect.getfile(inspect.currentframe()))
+    fontpath = os.path.join(mypath,'fonts')
+    logging.info("importing all fonts from %s" % fontpath)
+    for fn in os.listdir(fontpath):
+        try:
+            _builtin_fonts[fn] = font_from_file(os.path.join(fontpath,fn))
+        except:
+            logging.warn("import font failed (%s)" % fn)
+        
 
 def font_from_file(filename):
     """Extract font info from zipfile or plain textfile."""
@@ -94,7 +127,7 @@ class BigFont(BaseObject):
         """Return string rendered in the font, suitable for printing."""
         return functools.reduce(operator.add, [self[c] for c in s])
 
-    def print(self,s):
+    def bigprint(self,s):
         """Render and print multi-line string."""
         lines = s.split(self.eol)
         for line in lines:
