@@ -1,3 +1,7 @@
 bigfont is a pure Python library for rendering large console text
 using fixed-width characters (ASCII art), similar to the programs
 FIGlet or TOIlet.
+
+See help in the python interpreter:
+  import bigfont
+  help(bigfont)
