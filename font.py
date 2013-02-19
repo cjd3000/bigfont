@@ -6,10 +6,11 @@ import functools
 import os
 import re
 import logging
-import base
 import operator
 import pickle
 import inspect
+import traceback
+import gzip
 
 from zipfile import ZipFile, BadZipfile # or BadZipFile in 3.x
 from base import BaseObject
@@ -34,6 +35,18 @@ def render(text,font=None):
 
     return font.render(text)
 
+def _load_fonts(path):
+    ret = {}
+    for fn in os.listdir(path):
+        try:
+            ret[fn] = font_from_file(os.path.join(path,fn))
+            root,ext = os.path.splitext(fn)
+            ret[root] = ret[fn] # also save without extenstion
+        except:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            logging.warn("import %s failed, %s: %s " % (fn,exc_type,exc_value))
+    return ret
+
 _builtin_fonts = {}
 def _get_builtins():
     """Retrieve any fonts from bigfont/fonts."""
@@ -41,12 +54,7 @@ def _get_builtins():
     mypath = os.path.dirname(inspect.getfile(inspect.currentframe()))
     fontpath = os.path.join(mypath,'fonts')
     logging.info("importing all fonts from %s" % fontpath)
-    for fn in os.listdir(fontpath):
-        try:
-            _builtin_fonts[fn] = font_from_file(os.path.join(fontpath,fn))
-        except:
-            logging.warn("import font failed (%s)" % fn)
-        
+    _builtin_fonts = _load_fonts(fontpath)
 
 def font_from_file(filename):
     """Extract font info from zipfile or plain textfile."""
@@ -65,10 +73,16 @@ def font_from_file(filename):
                   
     return BigFont(data,name=filename)
 
-def font_from_pickle(fontname,pklfile='fontcache.pkl'):
-    with open(pklfile,'r') as fh:
+def font_from_pickle(fontname,pklfile='fontcache.pkl.gz'):
+    with gzip.GzipFile(pklfile,'rb') as fh:
         pklfonts = pickle.load(fh)
-        return pklfonts[fontname]
+    return pklfonts[fontname]
+
+def pickle_fonts(path,pklfile='fontcache.pkl.gz'):
+    logging.info("importing all fonts from %s" % path)
+    fonts = _load_fonts(path)
+    with gzip.GzipFile(pklfile,'wb') as fh:
+        pickle.dump(fonts,fh,2) # protocol 2 (new, more efficient)
 
 class BigFont(BaseObject):
     """Stores all characters from a font as a list of BigLetters."""
