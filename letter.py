@@ -1,6 +1,5 @@
 import re
 import logging
-import functools
 import copy
 from itertools import izip
 from smoosh import Smoosher
@@ -23,26 +22,28 @@ class BigLetter(BaseObject):
     def _set_lines(self,lines):
         self.lines = list(lines)
         self.height = len(lines)
-        self.maxwidth = functools.reduce(max,[len(line) for line in lines])    
+        self.maxwidth = max(lines,key=len)  
 
     def __str__(self):
         out = "\n".join(self.lines)
         return re.sub(re.escape(self.hardblank),' ',out) # remove hardblanks
 
     def __add__(self,other):
+        """Shortcut to push()."""
         return self.push(other)
 
     def __eq__(self,other):
-        if self.lines == other.lines:
-            return True
-        return False
+        for sline, oline in izip(self,other):
+            if sline != oline:
+                return False
+        return True
 
     def __iter__(self):
         for line in self.lines:
             yield line
 
     def touch(self,other):
-        """Determine this letter touches other letter on its right side."""
+        """Determine if this letter touches another letter on its right side."""
         for lr,rr in izip(self,other):
             if lr[-1] != ' ' and rr[0] != ' ':
                 return True
@@ -63,7 +64,7 @@ class BigLetter(BaseObject):
         return minspace
 
     def kern(self,other):
-        """Overlap two letters until they touch."""
+        """Overlap two letters until they touch, and return a new letter."""
         overlap = self.horizontal_space(other)
         return self.push(other,overlap=overlap)    
 

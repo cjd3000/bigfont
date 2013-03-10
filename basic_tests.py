@@ -7,9 +7,11 @@ from letter import BigLetter
 class BasicBigLetterTests(unittest.TestCase):
     def setUp(self):
         d = ["|-\\","| |","| /"]
+        d3 = ["|-\\","| |","| /"] # same as d, but different ref
         e = ("----","--  ","____")
         self.letterD = BigLetter(d)
         self.letterD2 = BigLetter(d)
+        self.letterD3 = BigLetter(d3)
         self.letterE = BigLetter(e)
 
     def test_add(self):
@@ -22,8 +24,13 @@ class BasicBigLetterTests(unittest.TestCase):
 
     def test_equality(self):
         self.assertNotEqual(self.letterD,self.letterE)
+        # same exact letter
         self.assertEqual(self.letterD,self.letterD)
+        # letter made from exact same list
         self.assertEqual(self.letterD,self.letterD2)
+        # letter made from different list with same contents
+        self.assertEqual(self.letterD,self.letterD3)
+        # copied letter
         self.assertEqual(self.letterD,copy.copy(self.letterD))
 
 
