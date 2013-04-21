@@ -2,7 +2,7 @@ import unittest
 import os
 import copy
 
-from letter import BigLetter
+from letter import BigLetter,Rotate
 
 class BasicBigLetterTests(unittest.TestCase):
     def setUp(self):
@@ -33,6 +33,22 @@ class BasicBigLetterTests(unittest.TestCase):
         # copied letter
         self.assertEqual(self.letterD,copy.copy(self.letterD))
 
+    def test_rotate(self):
+        rr = [ '1234','5678','9abc' ]
+        rrcw = [ '951','a62','b73','c84' ]
+        rrccw = [ '48c','37b','26a','159' ]
+        self.assertEqual( BigLetter(rr).rotate(Rotate.cw),
+                          BigLetter(rrcw) )
+        self.assertEqual( BigLetter(rr).rotate(Rotate.ccw),
+                          BigLetter(rrccw) )
+        rlet = BigLetter(rr)
+        rcpy = copy.copy(rlet)
+        for i in xrange(4): # full cw rotation
+            rlet.rotate(Rotate.cw)
+        self.assertEqual(rlet,rcpy)
+        for i in xrange(4): # full ccw rotation
+            rlet.rotate(Rotate.ccw)
+        self.assertEqual(rlet,rcpy)
 
 from font import BigFont, font_from_file
 

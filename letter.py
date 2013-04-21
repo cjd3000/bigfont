@@ -5,6 +5,12 @@ from itertools import izip
 from smoosh import Smoosher
 from base import BaseObject
 
+class Rotate(BaseObject):
+    clockwise = 1
+    cw = 1
+    counterclockwise = -1
+    ccw = -1
+
 class BigLetter(BaseObject):
     """
     Represents a single letter in a font.
@@ -21,8 +27,8 @@ class BigLetter(BaseObject):
 
     def _set_lines(self,lines):
         self.lines = list(lines)
-        self.height = len(lines)
-        self.maxwidth = max(lines,key=len)  
+        self.height = len(self.lines)
+        self.maxwidth = max(self.lines,key=len)  
 
     def __str__(self):
         out = "\n".join(self.lines)
@@ -82,3 +88,15 @@ class BigLetter(BaseObject):
         newletter._set_lines(newlines)
         return newletter           
 
+    def rotate(self,rotation=Rotate.clockwise):
+        if rotation == Rotate.clockwise:
+            self._set_lines(''.join(reversed(chars)) for chars in \
+                            zip(*self.lines))
+        elif rotation == Rotate.counterclockwise:
+            self._set_lines(''.join(chars) for chars in \
+                            zip(*(reversed(line) for line in self.lines)))
+        else:
+            pass
+        return self
+
+                
