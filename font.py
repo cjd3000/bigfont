@@ -74,8 +74,11 @@ def font_from_file(filename):
         with open(filename,'r') as fh:
             data = fh.readlines()
         break
-                  
-    return BigFont(data,name=filename)
+
+    try:     
+        return BigFont(data,name=filename)
+    except BigFontError:
+        raise BigFontError("file %s could not be parsed" % filename)
 
 def font_from_pickle(fontname,pklfile='fontcache.pkl.gz'):
     with gzip.GzipFile(pklfile,'rb') as fh:
@@ -118,7 +121,8 @@ class BigFont(BaseObject):
         # last char in first data line is the endchar
         endchar = lines[header['comment_lines'] + 1][-1]
         buf = []
-        letters = [ None for _ in xrange(256) ]
+        maxchar = 255
+        letters = [ None for _ in xrange(maxchar+1) ]
         index = 32 # first required character index
         optional_chars = re.compile(r"""^(\d+)\b.+(?<!%s)$""" % endchar)
         
@@ -128,17 +132,21 @@ class BigFont(BaseObject):
                 if m:
                     index = int(m.group(1))
                     continue
+
+            if index > maxchar:
+                continue
+                
             if len(line) > 1 and line[-2:] == (endchar*2):
                 buf.append(line[:-2])
-                print(index)
                 letters[index] = BigLetter(buf,hardblank=header['hardblank'])
-                print(letters[index])
+                logging.debug("loaded character %s:\n%s" % (index,letters[index]))
                 index += 1
                 buf = []
             elif len(line) > 0 and line[-1] == endchar:
                 buf.append(line[:-1])
 
         # copy required german characters to their correct positions
+        # from 127-133
         moveto = (196,214,220,228,246,252,223)
         for idx,char in enumerate(moveto):
             if letters[char] is None and letters[idx+127] is not None:
