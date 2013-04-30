@@ -4,6 +4,7 @@ import copy
 from itertools import izip
 from smoosh import Smoosher
 from base import BaseObject
+from decorators import trace
 
 class Rotate(BaseObject):
     clockwise = 1
@@ -21,7 +22,7 @@ class BigLetter(BaseObject):
         self._set_lines(lines)
         self.hardblank = hardblank
         if rules is None:
-            self.rules = Smoosher()
+            self.rules = Smoosher(hardblank=hardblank)
         else:
             self.rules = rules
 
@@ -35,8 +36,8 @@ class BigLetter(BaseObject):
         return re.sub(re.escape(self.hardblank),' ',out) # remove hardblanks
 
     def __add__(self,other):
-        """Shortcut to push()."""
-        return self.push(other)
+        """Shortcut to kern()."""
+        return self.kern(other)
 
     def __eq__(self,other):
         for sline, oline in izip(self,other):
@@ -55,13 +56,14 @@ class BigLetter(BaseObject):
                 return True
         return False
 
+    @trace
     def horizontal_space(self,other):
         """Returns the smallest amount of horizontal space between
         this letter's right side and another letter."""
         minspace = None
         for lrow,rrow in izip(self,other):
-            ls = lrow.rstrip(' ')
-            rs = rrow.lstrip(' ')
+            ls = lrow.rstrip()
+            rs = rrow.lstrip()
             lstripped = len(lrow) - len(ls)
             rstripped = len(rrow) - len(rs)
             separation = lstripped + rstripped
@@ -86,7 +88,7 @@ class BigLetter(BaseObject):
             newlines.append(leftchars + overlapped + rightchars)
         newletter = copy.copy(self)
         newletter._set_lines(newlines)
-        return newletter           
+        return newletter        
 
     def rotate(self,rotation=Rotate.clockwise):
         if rotation == Rotate.clockwise:
