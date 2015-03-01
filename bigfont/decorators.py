@@ -1,9 +1,8 @@
 import functools
 import logging
-import types
 import collections
 import time
-import itertools
+
 
 def is_iterable(x):
     """Returns true if a function is a non-string iterable."""
