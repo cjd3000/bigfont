@@ -6,4 +6,4 @@ python:
   - "3.3"
   - "3.4"
 # command to run tests
-script: python fonts/basic_tests.py
+script: python bigfont/basic_tests.py
