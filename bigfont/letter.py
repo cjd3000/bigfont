@@ -1,7 +1,10 @@
 import re
 import logging
 import copy
-from itertools import izip
+try:  # py 2/3 compatible import
+    from itertools import izip as zip
+except ImportError:
+    pass
 from smoosh import Smoosher
 from base import BaseObject
 from decorators import trace
@@ -40,7 +43,7 @@ class BigLetter(BaseObject):
         return self.kern(other)
 
     def __eq__(self,other):
-        for sline, oline in izip(self,other):
+        for sline, oline in zip(self,other):
             if sline != oline:
                 return False
         return True
@@ -51,7 +54,7 @@ class BigLetter(BaseObject):
 
     def touch(self,other):
         """Determine if this letter touches another letter on its right side."""
-        for lr,rr in izip(self,other):
+        for lr,rr in zip(self,other):
             if lr[-1] != ' ' and rr[0] != ' ':
                 return True
         return False
@@ -61,7 +64,7 @@ class BigLetter(BaseObject):
         """Returns the smallest amount of horizontal space between
         this letter's right side and another letter."""
         minspace = None
-        for lrow,rrow in izip(self,other):
+        for lrow,rrow in zip(self,other):
             ls = lrow.rstrip()
             rs = rrow.lstrip()
             lstripped = len(lrow) - len(ls)

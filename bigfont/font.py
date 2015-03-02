@@ -56,12 +56,12 @@ def _get_builtins():
     """Retrieve any fonts from bigfont/fonts."""
     global _builtin_fonts
     mypath = os.path.dirname(inspect.getfile(inspect.currentframe()))
-    fontpath = os.path.join(mypath,'fonts')
+    fontpath = os.path.join(mypath, 'fonts')
     logging.info("importing all fonts from %s" % fontpath)
     _builtin_fonts = _load_fonts(fontpath)
 
 def font_from_file(filename):
-    """Extract font info from zipfile or plain textfile."""
+    """Extract font info from zipfile or plain text file."""
     data = None
     while 1:
         try: # zipped?

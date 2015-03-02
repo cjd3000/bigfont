@@ -1,5 +1,8 @@
 import logging
-from itertools import izip
+try:  # py 2/3 compatible import
+    from itertools import izip as zip
+except ImportError:
+    pass
 from base import BaseObject
 
 def _smoosh_spaces(left,right):
@@ -108,7 +111,7 @@ class Smoosher(BaseObject):
         """Smoosh single characters according to smooshing rules."""
         
         outchars = []
-        for lc,rc in izip(left,right):
+        for lc, rc in zip(left, right):
             for rule in self.rules:
                 sc = rule(lc,rc)
                 if sc is not None:
