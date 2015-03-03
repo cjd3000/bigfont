@@ -6,4 +6,6 @@ python:
   - "3.3"
   - "3.4"
 # command to run tests
-script: python bigfont/basic_tests.py
+script:
+  - pep8 --ignore=E501 bigfont
+  - python bigfont/basic_tests.py

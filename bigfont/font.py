@@ -13,45 +13,53 @@ import traceback
 import gzip
 import sys
 
-from zipfile import ZipFile, BadZipfile # or BadZipFile in 3.x
+from zipfile import ZipFile, BadZipfile  # or BadZipFile in 3.x
 from base import BaseObject
 from letter import BigLetter
 from decorators import trace
 
+
 class BigFontError(Exception):
     pass
 
-def bigprint(text,font=None):
+
+def bigprint(text, font=None):
     """Print text in big font.
 
     Uses given BigFont if specified, otherwise a default font."""
-    print(render(text,font))
+    print(render(text, font))
+
 
 _default_font = 'standard.flf'
-def render(text,font=None):
+
+
+def render(text, font=None):
     """Render text in big font and return as a string.
 
     Uses given BigFont if specified, otherwise a default font."""
     if font is None:
-        if not _builtin_fonts.has_key(_default_font):
+        if _default_font not in _builtin_fonts:
             _get_builtins()
             font = _builtin_fonts[_default_font]
 
     return font.render(text)
 
+
 def _load_fonts(path):
     ret = {}
     for fn in os.listdir(path):
         try:
-            ret[fn] = font_from_file(os.path.join(path,fn))
-            root,ext = os.path.splitext(fn)
-            ret[root] = ret[fn] # also save without extenstion
-        except:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.warn("import %s failed, %s: %s " % (fn,exc_type,exc_value))
+            ret[fn] = font_from_file(os.path.join(path, fn))
+            root, ext = os.path.splitext(fn)
+            ret[root] = ret[fn]  # also save without extension
+        except Exception:
+            logging.warn("import %s failed", fn, exc_info=1)
     return ret
 
+
 _builtin_fonts = {}
+
+
 def _get_builtins():
     """Retrieve any fonts from bigfont/fonts."""
     global _builtin_fonts
@@ -60,74 +68,79 @@ def _get_builtins():
     logging.info("importing all fonts from %s" % fontpath)
     _builtin_fonts = _load_fonts(fontpath)
 
+
 def font_from_file(filename):
     """Extract font info from zipfile or plain text file."""
     data = None
     while 1:
-        try: # zipped?
-            with ZipFile(filename,'r') as fh:
+        try:  # zipped?
+            with ZipFile(filename, 'r') as fh:
                 data = fh.read(os.path.basename(filename))
             break
         except BadZipfile as e:
             logging.info("%s does not appear to be a zipfile" % filename)
 
-        with open(filename,'r') as fh:
+        with open(filename, 'r') as fh:
             data = fh.readlines()
         break
 
-    try:     
-        return BigFont(data,name=filename)
+    try:
+        return BigFont(data, name=filename)
     except BigFontError:
         raise BigFontError("file %s could not be parsed" % filename)
 
-def font_from_pickle(fontname,pklfile='fontcache.pkl.gz'):
-    with gzip.GzipFile(pklfile,'rb') as fh:
+
+def font_from_pickle(fontname, pklfile='fontcache.pkl.gz'):
+    with gzip.GzipFile(pklfile, 'rb') as fh:
         pklfonts = pickle.load(fh)
     return pklfonts[fontname]
 
-def pickle_fonts(path,pklfile='fontcache.pkl.gz'):
+
+def pickle_fonts(path, pklfile='fontcache.pkl.gz'):
     logging.info("importing all fonts from %s" % path)
     fonts = _load_fonts(path)
-    with gzip.GzipFile(pklfile,'wb') as fh:
-        pickle.dump(fonts,fh,2) # protocol 2 (new, more efficient)
+    with gzip.GzipFile(pklfile, 'wb') as fh:
+        pickle.dump(fonts, fh, 2)  # protocol 2 (new, more efficient)
+
 
 class BigFont(BaseObject):
     """Stores all characters from a font as a list of BigLetters."""
-    def __init__(self,data=None,name=None,nonprintable=32,eol="\n",**kwargs):
-        super(BigFont,self).__init__(**kwargs)
+
+    def __init__(self, data=None, name=None, nonprintable=32, eol="\n", **kwargs):
+        super(BigFont, self).__init__(**kwargs)
         self.nonprintable = nonprintable
         try:
             self.letters = self._extract_letters(data)
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            logging.warn("load failed, %s: %s " % (exc_type,exc_value))
+            logging.warn("load failed, %s: %s " % (exc_type, exc_value))
             raise BigFontError("font data did not make sense")
-        #self.renderfcn = kern
+        # self.renderfcn = kern
         self.eol = eol
         self.name = name
-        self.smooshrules = None # make rules from header line
+        self.smooshrules = None  # make rules from header line
         self.raise_missing = True
 
-    def _extract_letters(self,data):
+    def _extract_letters(self, data):
         """Extract list of BigLetters from flf file data"""
         if data is None:
             return None
-        elif isinstance(data,str):
-            lines = re.split("\r?\n",data)
+        elif isinstance(data, str):
+            lines = re.split("\r?\n", data)
         else:
             lines = [line.rstrip() for line in data]
-            
+
         header = self._parse_header(lines[0])
         # last char in first data line is the endchar
         endchar = lines[header['comment_lines'] + 1][-1]
         buf = []
         maxchar = 255
-        letters = [ None for _ in xrange(maxchar+1) ]
-        index = 32 # first required character index
+        letters = [None for _ in xrange(maxchar + 1)]
+        index = 32  # first required character index
         optional_chars = re.compile(r"""^(\d+)\b.+(?<!%s)$""" % endchar)
-        
+
         for line in lines:
-            if index > 126: # required chars
+            if index > 126:  # required chars
                 m = re.match(optional_chars, line)
                 if m:
                     index = int(m.group(1))
@@ -135,11 +148,11 @@ class BigFont(BaseObject):
 
             if index > maxchar:
                 continue
-                
-            if len(line) > 1 and line[-2:] == (endchar*2):
+
+            if len(line) > 1 and line[-2:] == (endchar * 2):
                 buf.append(line[:-2])
-                letters[index] = BigLetter(buf,hardblank=header['hardblank'])
-                logging.debug("loaded character %s:\n%s" % (index,letters[index]))
+                letters[index] = BigLetter(buf, hardblank=header['hardblank'])
+                logging.debug("loaded character %s:\n%s" % (index, letters[index]))
                 index += 1
                 buf = []
             elif len(line) > 0 and line[-1] == endchar:
@@ -147,11 +160,11 @@ class BigFont(BaseObject):
 
         # copy required german characters to their correct positions
         # from 127-133
-        moveto = (196,214,220,228,246,252,223)
-        for idx,char in enumerate(moveto):
-            if letters[char] is None and letters[idx+127] is not None:
-                letters[char] = letters[idx+127]
-                letters[idx+127] = None
+        moveto = (196, 214, 220, 228, 246, 252, 223)
+        for idx, char in enumerate(moveto):
+            if letters[char] is None and letters[idx + 127] is not None:
+                letters[char] = letters[idx + 127]
+                letters[idx + 127] = None
 
         return letters
 
@@ -161,7 +174,7 @@ class BigFont(BaseObject):
                 yield letter
 
     @trace
-    def _parse_header(self,hdr):
+    def _parse_header(self, hdr):
         """Retrieve info from FIGfont header line, return as dict."""
         out = {}
         if len(hdr) < 5 or hdr[0:5] != "flf2a":
@@ -169,23 +182,23 @@ class BigFont(BaseObject):
         fields = hdr.split()
         out['signature'] = fields[0][0:5]
         out['hardblank'] = fields[0][5]
-        out['height']     = int(fields[1])
-        out['baseline']   = int(fields[2])
+        out['height'] = int(fields[1])
+        out['baseline'] = int(fields[2])
         out['max_length'] = int(fields[3])
         out['old_layout'] = int(fields[4])
         out['comment_lines'] = int(fields[5])
         if len(fields) > 6:
             out['print_direction'] = int(fields[6])
-            out['full_layout']     = int(fields[7])
-            out['codetag_count']   = int(fields[8])
+            out['full_layout'] = int(fields[7])
+            out['codetag_count'] = int(fields[8])
 
         return out
-        
-    def __call__(self,s):
+
+    def __call__(self, s):
         """Shortcut to render()."""
         return self.render(s)
-    
-    def __getitem__(self,key):
+
+    def __getitem__(self, key):
         """Access a BigLetter from the character representation."""
         try:
             return self.letters[ord(key)]
@@ -193,19 +206,14 @@ class BigFont(BaseObject):
             if self.raise_missing:
                 raise KeyError("%s is not present in font" % key)
             else:
-                return self.letters[ord('?')] # fixme, return an empty Bigletter?
+                return self.letters[ord('?')]  # fixme, return an empty Bigletter?
 
-    def render(self,s):
+    def render(self, s):
         """Return string rendered in the font, suitable for printing."""
         return functools.reduce(operator.add, [self[c] for c in s])
 
-    def bigprint(self,s):
+    def bigprint(self, s):
         """Render and print multi-line string."""
         lines = s.split(self.eol)
         for line in lines:
             print(self.render(line))
-
-
-
-
-
