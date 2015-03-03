@@ -1,11 +1,12 @@
 import unittest
 import os
 import copy
+import inspect
+from . import font
+from .letter import BigLetter, Rotate
+from .font import font_from_file
 
-FONT_DIR = 'fonts'
-import font
-from letter import BigLetter, Rotate
-from font import font_from_file
+FONT_DIR = os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), 'fonts')
 
 
 class BasicBigLetterTests(unittest.TestCase):
@@ -47,10 +48,10 @@ class BasicBigLetterTests(unittest.TestCase):
                          BigLetter(rrccw))
         rlet = BigLetter(rr)
         rcpy = copy.copy(rlet)
-        for i in xrange(4):  # full cw rotation
+        for i in range(4):  # full cw rotation
             rlet.rotate(Rotate.cw)
         self.assertEqual(rlet, rcpy)
-        for i in xrange(4):  # full ccw rotation
+        for i in range(4):  # full ccw rotation
             rlet.rotate(Rotate.ccw)
         self.assertEqual(rlet, rcpy)
 
