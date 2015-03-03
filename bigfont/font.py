@@ -135,7 +135,7 @@ class BigFont(BaseObject):
         endchar = lines[header['comment_lines'] + 1][-1]
         buf = []
         maxchar = 255
-        letters = [None for _ in xrange(maxchar + 1)]
+        letters = [None] * (maxchar + 1)
         index = 32  # first required character index
         optional_chars = re.compile(r"""^(\d+)\b.+(?<!%s)$""" % endchar)
 
