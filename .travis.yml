@@ -5,7 +5,8 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
-# command to run tests
+install:
+  - pip install pep8
 script:
   - pep8 --ignore=E501 bigfont
   - python bigfont/basic_tests.py
