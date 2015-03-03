@@ -14,9 +14,9 @@ import gzip
 import sys
 
 from zipfile import ZipFile, BadZipfile  # or BadZipFile in 3.x
-from base import BaseObject
-from letter import BigLetter
-from decorators import trace
+from .base import BaseObject
+from .letter import BigLetter
+from .decorators import trace
 
 
 class BigFontError(Exception):

@@ -2,9 +2,9 @@ import unittest
 import os
 import copy
 import inspect
-import font
-from letter import BigLetter, Rotate
-from font import font_from_file
+from . import font
+from .letter import BigLetter, Rotate
+from .font import font_from_file
 
 FONT_DIR = os.path.join(os.path.dirname(inspect.getfile(inspect.currentframe())), 'fonts')
 

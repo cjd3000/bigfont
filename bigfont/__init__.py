@@ -22,7 +22,8 @@ http://www.jave.de/figlet/fonts.html
 """
 
 
-from font import BigFont
-from font import font_from_file
-from font import render
-from font import bigprint
+from .font import BigFont
+from .font import font_from_file
+from .font import render
+from .font import bigprint
+from . import basic_tests

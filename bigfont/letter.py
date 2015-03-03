@@ -6,9 +6,9 @@ try:  # py 2/3 compatible import
     from itertools import izip as zip
 except ImportError:
     pass
-from smoosh import Smoosher
-from base import BaseObject
-from decorators import trace
+from .smoosh import Smoosher
+from .base import BaseObject
+from .decorators import trace
 
 
 class Rotate(BaseObject):

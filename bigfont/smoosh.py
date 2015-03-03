@@ -4,7 +4,7 @@ try:  # py 2/3 compatible import
     from itertools import izip as zip
 except ImportError:
     pass
-from base import BaseObject
+from .base import BaseObject
 
 
 def _smoosh_spaces(left, right):
