@@ -6,6 +6,9 @@ python:
   - "3.4"
 install:
   - pip install pep8
+  - pip install coveralls
 script:
   - pep8 --ignore=E501 bigfont
-  - python -m unittest bigfont.basic_tests
+  - nosetests --with-coverage --cover-package=bigfont
+after_success:
+  - coveralls
