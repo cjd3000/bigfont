@@ -86,12 +86,15 @@ class BigLetter(BaseObject):
         """Push two letters together into a new one."""
         newlines = []
         for s, o in zip(self.lines, other.lines):
-            leftchars = s[:-overlap]
-            rightchars = o[overlap:]
-            leftoverlap = s[-overlap:]
-            rightoverlap = o[:overlap]
-            overlapped = self.rules.smoosh(leftoverlap, rightoverlap)
-            newlines.append(leftchars + overlapped + rightchars)
+            if overlap < 1:
+                newlines.append(s + o)
+            else:
+                leftchars = s[:-overlap]
+                rightchars = o[overlap:]
+                leftoverlap = s[-overlap:]
+                rightoverlap = o[:overlap]
+                overlapped = self.rules.smoosh(leftoverlap, rightoverlap)
+                newlines.append(leftchars + overlapped + rightchars)
         newletter = copy.copy(self)
         newletter._set_lines(newlines)
         return newletter
