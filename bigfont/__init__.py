@@ -21,6 +21,7 @@ More fonts can be obtained from:
 http://www.jave.de/figlet/fonts.html
 """
 
+__version__ = "0.1.0"
 
 from .font import BigFont
 from .font import font_from_file

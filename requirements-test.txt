@@ -1,0 +1,4 @@
+nose
+pyhamcrest
+six
+coveralls
